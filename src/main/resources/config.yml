@@ -1,4 +1,10 @@
 servers:
-  lobby: "中心大厅"
-  survive: "生存世界"
-  minigame: "小游戏区"
+  lobby:
+    name: "中心大厅"
+    color: "AQUA"
+  survive:
+    name: "生存世界"
+    color: "GREEN"
+  minigame:
+    name: "小游戏区"
+    color: "YELLOW"

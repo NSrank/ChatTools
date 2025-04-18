@@ -8,7 +8,6 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
-import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.command.SimpleCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,12 +26,12 @@ import java.util.Optional;
 @Plugin(
         id = "chattools",
         name = "ChatTools",
-        version = "1.0-SNAPSHOT"
+        version = "1.1-SNAPSHOT"
 )
 public class ChatTools {
     private final ProxyServer server;
     private final Logger logger;
-    private final Map<String, String> serverAliases = new HashMap<>();
+    private final Map<String, ServerAlias> serverAliases = new HashMap<>();
 
     @Inject
     public ChatTools(ProxyServer server, Logger logger) {
@@ -41,10 +40,21 @@ public class ChatTools {
 
         logger.info("===================================");
         logger.info("ChatTools 插件已加载");
-        logger.info("版本：1.0 | 作者：NSrank & Qwen2.5-Max");
+        logger.info("版本：1.1 | 作者：NSrank & Qwen2.5-Max");
         logger.info("===================================");
 
         loadConfig();
+    }
+
+    // 定义服务器别名类
+    private static class ServerAlias {
+        String name;
+        NamedTextColor color;
+
+        public ServerAlias(String name, NamedTextColor color) {
+            this.name = name;
+            this.color = color;
+        }
     }
 
     private void loadConfig() {
@@ -65,8 +75,24 @@ public class ChatTools {
                 Map<String, Object> data = yaml.load(in);
                 if (data != null && data.containsKey("servers")) {
                     @SuppressWarnings("unchecked")
-                    Map<String, String> servers = (Map<String, String>) data.get("servers");
-                    serverAliases.putAll(servers);
+                    Map<String, Map<String, String>> servers = (Map<String, Map<String, String>>) data.get("servers");
+
+                    for (Map.Entry<String, Map<String, String>> entry : servers.entrySet()) {
+                        String serverId = entry.getKey();
+                        Map<String, String> serverData = entry.getValue();
+
+                        String aliasName = serverData.get("name");
+                        String colorName = serverData.get("color");
+
+                        NamedTextColor color = NamedTextColor.NAMES.value(colorName.toLowerCase());
+                        if (color == null) {
+                            color = NamedTextColor.AQUA; // 默认颜色
+                            logger.warn("无效的颜色值 '{}'，使用默认颜色 AQUA", colorName);
+                        }
+
+                        serverAliases.put(serverId, new ServerAlias(aliasName, color));
+                    }
+
                     logger.info("配置文件加载成功，共加载 {} 个服务器别名", servers.size());
                 }
             }
@@ -84,15 +110,20 @@ public class ChatTools {
         if (currentServer.isEmpty()) return;
 
         String serverName = currentServer.get().getServerInfo().getName();
-        String alias = serverAliases.getOrDefault(serverName, serverName);
+        ServerAlias alias = serverAliases.getOrDefault(serverName, new ServerAlias(serverName, NamedTextColor.AQUA));
+
+        // 手动构建玩家身份组件
+        Component playerNameComponent = Component.text()
+                .append(Component.text(player.getUsername()).color(NamedTextColor.YELLOW)) // 玩家名字
+                .build();
 
         Component message = Component.text()
                 .append(Component.text("[").color(NamedTextColor.GRAY))
-                .append(Component.text(alias).color(NamedTextColor.AQUA))
+                .append(Component.text(alias.name).color(alias.color)) // 服务器名称
                 .append(Component.text("] ").color(NamedTextColor.GRAY))
-                .append(Component.text(player.getUsername()).color(NamedTextColor.YELLOW))
+                .append(playerNameComponent) // 玩家名字
                 .append(Component.text(": ").color(NamedTextColor.WHITE))
-                .append(Component.text(event.getMessage()))
+                .append(Component.text(event.getMessage())) // 聊天内容
                 .build();
 
         server.getAllPlayers().forEach(p -> p.sendMessage(message));
