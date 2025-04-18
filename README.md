@@ -53,10 +53,16 @@
 ## 配置文件
 插件的配置文件位于 `plugins/ChatTools/config.yml`，格式如下：
 ```yaml  
-servers:  
-  lobby: "中心大厅"  
-  survive: "生存世界"  
-  minigame: "小游戏区"  
+servers:
+  lobby:
+    name: "中心大厅"
+    color: "AQUA"
+  survive:
+    name: "生存世界"
+    color: "GREEN"
+  minigame:
+    name: "小游戏区"
+    color: "YELLOW"
 ```
 - 修改说明 ：  
  - **键**（如 lobby）为 **Velocity 配置中的服务器 ID**。  
