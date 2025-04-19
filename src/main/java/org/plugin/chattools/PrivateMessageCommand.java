@@ -52,18 +52,25 @@ public class PrivateMessageCommand implements SimpleCommand { // 改用 SimpleCo
         String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
         Component formattedMessage = Component.text()
+                // 发送服务器别名
                 .append(Component.text("[").color(NamedTextColor.GRAY))
                 .append(Component.text(
                         plugin.getServerAlias(sender.getCurrentServer().get().getServerInfo().getName()).name
                 ).color(plugin.getServerAlias(sender.getCurrentServer().get().getServerInfo().getName()).color))
                 .append(Component.text("] ").color(NamedTextColor.GRAY))
-                .append(Component.text(sender.getUsername()).color(NamedTextColor.YELLOW))
+                // 发送者名字
+                .append(Component.text(sender.getUsername()).color(NamedTextColor.WHITE))
+                // 发送到的箭头
                 .append(Component.text(" → ").color(NamedTextColor.GRAY))
+                // 目标服务器别名
+                .append(Component.text("[").color(NamedTextColor.GRAY))
                 .append(Component.text(
                         plugin.getServerAlias(target.getCurrentServer().get().getServerInfo().getName()).name
                 ).color(plugin.getServerAlias(target.getCurrentServer().get().getServerInfo().getName()).color))
-                .append(Component.text(" ").color(NamedTextColor.GRAY))
-                .append(Component.text(target.getUsername()).color(NamedTextColor.YELLOW))
+                .append(Component.text("] ").color(NamedTextColor.GRAY))
+                // 目标名字
+                .append(Component.text(target.getUsername()).color(NamedTextColor.WHITE))
+                // 消息内容
                 .append(Component.text(": ").color(NamedTextColor.WHITE))
                 .append(Component.text(message))
                 .build(); // 使用正确的构建方法

@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Plugin(
         id = "chattools",
         name = "ChatTools",
-        version = "1.2-SNAPSHOT"
+        version = "1.3-SNAPSHOT"
 )
 public class ChatTools {
     private final ProxyServer server;
@@ -47,7 +47,7 @@ public class ChatTools {
 
         logger.info("===================================");
         logger.info("ChatTools 插件已加载");
-        logger.info("版本：1.2 | 作者：NSrank & Qwen2.5-Max");
+        logger.info("版本：1.3 | 作者：NSrank & Qwen2.5-Max");
         logger.info("===================================");
 
         loadConfig();
@@ -151,7 +151,7 @@ public class ChatTools {
 
         // 手动构建玩家身份组件
         Component playerNameComponent = Component.text()
-                .append(Component.text(player.getUsername()).color(NamedTextColor.YELLOW)) // 玩家名字
+                .append(Component.text(player.getUsername()).color(NamedTextColor.WHITE)) // 玩家名字
                 .build();
 
         Component message = Component.text()

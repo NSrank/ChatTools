@@ -1,7 +1,7 @@
 {
   "id": "chattools",
   "name": "ChatTools",
-  "version": "1.2",
+  "version": "1.3",
   "description": "跨服聊天和服务器别名工具",
   "authors": ["NSrank & Qwen2.5-Max"],
   "main": "org.plugin.chattools.ChatTools",
