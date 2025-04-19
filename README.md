@@ -107,3 +107,114 @@ servers:
 - [SnakeYAML](https://github.com/snakeyaml/snakeyaml)
 - [Adventure API](https://github.com/KyoriPowered/adventure?spm=a2ty_o01.29997173.0.0.7c5733f51H3mj8)
 
+---
+
+# ChatTools - Velocity Cross-Server Chat Plugin
+![Velocity](https://img.shields.io/badge/Velocity-3.4.x-blue) ![Java](https://img.shields.io/badge/Java-17-green) ![License](https://img.shields.io/badge/License-GPLv3-green.svg)
+
+**ChatTools** is a cross-server chat management plugin designed for Minecraft Velocity servers. It supports **global message synchronization**, **custom server display names**, and **cross-server private messaging**, enhancing player communication in multi-server environments.
+
+> **Note**: This plugin is AI-developed to simplify cross-server chat management.
+
+---
+
+## Features
+- **Cross-Server Message Sync**:
+  - Messages sent by players on any sub-server are broadcast to all online players in real-time.
+  - Message format includes **server alias** and **player name**.
+- **Custom Server Names**:
+  - Define server display names via configuration files (e.g., `lobby` → `Main Lobby`).
+- **Cross-Server Private Messaging**:
+  - Use `/tell` or `/msg` to privately message players across servers.
+  - Messages are visible only to the **sender**, **receiver**, and **console**.
+  - Supports tab-completion for online player names.
+- **Dynamic Configuration**:
+  - Use `/chattools reload` to reload configurations without restarting the server.
+- **Compatibility**:
+  - Supports Velocity 3.4+ and Minecraft 1.16+.
+
+---
+
+## Installation
+### 1. Download the Plugin
+Download the latest `ChatTools.jar` from [GitHub](https://github.com/NSrank/ChatTools) or other distribution channels.
+
+### 2. Install the Plugin
+Place the downloaded `ChatTools.jar` into the `plugins/` directory of your Velocity server.
+
+### 3. Start the Server
+Start the Velocity server. The plugin will automatically generate the default configuration file at `plugins/ChatTools/config.yml`.
+
+---
+
+## Usage
+### Commands
+| Command                    | Permission             | Description                                                         |  
+|----------------------------|------------------------|---------------------------------------------------------------------|  
+| `/chattools reload`        | `chattools.reload`     | Reload the plugin configuration file to apply changes immediately.  |  
+| `/tell <player> <message>` | `chattools.command.tell` | Send a private message to a player across servers.                 |  
+| `/msg <player> <message>`  | `chattools.command.tell` | Alias for `/tell`.                                                |  
+
+### Examples
+1. **Cross-Server Chat**  
+
+A player in the `Lobby` server sends:
+
+```
+  [Main Lobby] Steve: Hello everyone!
+```  
+
+  A player in the `Survive` server replies:
+
+```   
+  [Survival World] Alex: Welcome to Survival!
+```
+
+2. **Cross-Server Private Message**:
+```
+  [Main Lobby] Steve → [Survival World] Alex: How's it going?
+```
+
+---
+
+## Configuration
+The configuration file is located at `plugins/ChatTools/config.yml`:
+```yaml  
+servers:
+  lobby:
+    name: "Main Lobby"
+    color: "AQUA"
+  survive:
+    name: "Survival World"
+    color: "GREEN"
+  minigame:
+    name: "MiniGame Zone"
+    color: "YELLOW"
+```
+- **Keys** (e.g., lobby) are **Velocity server IDs**.
+- **Values** (e.g., Main Lobby) are **display names** used in chat.
+
+---
+
+## Support and Feedback
+If you encounter any issues or have suggestions for improvements, please contact us through the following channels:
+
+-  **GitHub Issues**: [Submit an issue](https://github.com/NSrank/ChatTools/issues)
+
+---
+
+## License & Disclaimer  
+- **Development Statement**: This plugin is AI-developed to provide efficient chat management for the Minecraft Velocity community.
+
+- **License**: Licensed under GNU General Public License v3.0. You are free to use, modify, and distribute it under the license terms.
+
+- **Disclaimer**: The developer is not responsible for any issues arising from the use of this plugin.
+
+---
+
+## Acknowledgements
+Special thanks to the following technologies and tools:
+
+- [Velocity API](https://papermc.io/software/velocity)
+- [SnakeYAML](https://github.com/snakeyaml/snakeyaml)
+- [Adventure API](https://github.com/KyoriPowered/adventure?spm=a2ty_o01.29997173.0.0.7c5733f51H3mj8)

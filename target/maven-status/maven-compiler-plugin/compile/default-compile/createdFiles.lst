@@ -1,0 +1,4 @@
+org\plugin\chattools\ChatTools$ReloadCommand.class
+org\plugin\chattools\PrivateMessageCommand.class
+org\plugin\chattools\ChatTools.class
+org\plugin\chattools\ChatTools$ServerAlias.class
