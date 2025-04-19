@@ -2,12 +2,15 @@ package org.plugin.chattools;
 
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.command.SimpleCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,16 +25,20 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Plugin(
         id = "chattools",
         name = "ChatTools",
-        version = "1.1-SNAPSHOT"
+        version = "1.2-SNAPSHOT"
 )
 public class ChatTools {
     private final ProxyServer server;
     private final Logger logger;
     private final Map<String, ServerAlias> serverAliases = new HashMap<>();
+    private final Set<Player> onlinePlayers = ConcurrentHashMap.newKeySet();
 
     @Inject
     public ChatTools(ProxyServer server, Logger logger) {
@@ -40,21 +47,51 @@ public class ChatTools {
 
         logger.info("===================================");
         logger.info("ChatTools 插件已加载");
-        logger.info("版本：1.1 | 作者：NSrank & Qwen2.5-Max");
+        logger.info("版本：1.2 | 作者：NSrank & Qwen2.5-Max");
         logger.info("===================================");
 
         loadConfig();
     }
 
+    // 提供 Getter 方法
+    public ProxyServer getProxyServer() {
+        return server;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public Map<String, ServerAlias> getServerAliases() {
+        return serverAliases;
+    }
+
+    // 玩家连接/断开监听
+    @Subscribe
+    public void onPlayerJoin(LoginEvent event) {
+        onlinePlayers.add(event.getPlayer());
+    }
+
+    @Subscribe
+    public void onPlayerQuit(DisconnectEvent event) {
+        onlinePlayers.remove(event.getPlayer());
+    }
+
     // 定义服务器别名类
-    private static class ServerAlias {
-        String name;
-        NamedTextColor color;
+    // 服务器别名类
+    public static class ServerAlias {
+        public final String name;
+        public final NamedTextColor color;
 
         public ServerAlias(String name, NamedTextColor color) {
             this.name = name;
             this.color = color;
         }
+    }
+
+    // 获取服务器别名（处理空值）
+    public ServerAlias getServerAlias(String serverId) {
+        return serverAliases.getOrDefault(serverId, new ServerAlias(serverId, NamedTextColor.AQUA));
     }
 
     private void loadConfig() {
@@ -133,6 +170,8 @@ public class ChatTools {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         // 注册命令
         server.getCommandManager().register("chattools", new ReloadCommand());
+        server.getCommandManager().register("tell", new PrivateMessageCommand(this));
+        server.getCommandManager().register("msg", new PrivateMessageCommand(this));
     }
 
     // 使用 SimpleCommand 实现重载功能
@@ -150,4 +189,9 @@ public class ChatTools {
             logger.info("配置已由 {} 重载", source);
         }
     }
+
+    public Set<Player> getOnlinePlayers() {
+        return Collections.unmodifiableSet(onlinePlayers);
+    }
+
 }
