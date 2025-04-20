@@ -94,7 +94,7 @@ servers:
 ---
 
 ### 版权声明
-- 开发声明 ：本插件由 AI 开发，旨在为 Minecraft Velocity 社区提供高效的封禁管理工具。
+- 开发声明 ：本插件由 AI 开发，旨在为 Minecraft Velocity 社区提供高效的跨服聊天工具。
 - 许可证 ：本插件遵循 GNU General Public License v3.0 许可证，您可以自由使用、修改和分发，但需遵守许可证条款。
 - 免责条款 ：开发者不对因使用本插件而导致的任何问题负责。
 

@@ -7,6 +7,7 @@ import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
@@ -20,6 +21,7 @@ import org.yaml.snakeyaml.Yaml;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -32,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Plugin(
         id = "chattools",
         name = "ChatTools",
-        version = "1.3-SNAPSHOT"
+        version = "1.4-SNAPSHOT"
 )
 public class ChatTools {
     private final ProxyServer server;
@@ -47,7 +49,7 @@ public class ChatTools {
 
         logger.info("===================================");
         logger.info("ChatTools 插件已加载");
-        logger.info("版本：1.3 | 作者：NSrank & Qwen2.5-Max");
+        logger.info("版本：1.4 | 作者：NSrank & Qwen2.5-Max");
         logger.info("===================================");
 
         loadConfig();
@@ -138,6 +140,7 @@ public class ChatTools {
         }
     }
 
+    // 聊天事件处理
     @Subscribe(order = PostOrder.FIRST)
     public void onPlayerChat(PlayerChatEvent event) {
         event.setResult(PlayerChatEvent.ChatResult.denied());
@@ -146,21 +149,32 @@ public class ChatTools {
         Optional<ServerConnection> currentServer = player.getCurrentServer();
         if (currentServer.isEmpty()) return;
 
-        String serverName = currentServer.get().getServerInfo().getName();
-        ServerAlias alias = serverAliases.getOrDefault(serverName, new ServerAlias(serverName, NamedTextColor.AQUA));
+        String serverId = currentServer.get().getServerInfo().getName();
+        ServerAlias alias = serverAliases.getOrDefault(serverId, new ServerAlias(serverId, NamedTextColor.AQUA));
 
-        // 手动构建玩家身份组件
-        Component playerNameComponent = Component.text()
-                .append(Component.text(player.getUsername()).color(NamedTextColor.WHITE)) // 玩家名字
-                .build();
+        // 通过反射兼容 NameTools
+        Component prefixComponent = Component.empty();
+        Optional<PluginContainer> nameToolsOpt = server.getPluginManager().getPlugin("nametools");
+        if (nameToolsOpt.isPresent()) {
+            try {
+                Object nameToolsInstance = nameToolsOpt.get().getInstance().orElse(null);
+                if (nameToolsInstance != null) {
+                    Method getPrefixMethod = nameToolsInstance.getClass().getMethod("getFormattedPrefix", Player.class);
+                    prefixComponent = (Component) getPrefixMethod.invoke(nameToolsInstance, player);
+                }
+            } catch (Exception e) {
+                logger.warn("无法获取 NameTools 前缀，使用默认显示", e);
+            }
+        }
 
         Component message = Component.text()
                 .append(Component.text("[").color(NamedTextColor.GRAY))
-                .append(Component.text(alias.name).color(alias.color)) // 服务器名称
+                .append(Component.text(alias.name).color(alias.color))
                 .append(Component.text("] ").color(NamedTextColor.GRAY))
-                .append(playerNameComponent) // 玩家名字
+                .append(prefixComponent)
+                .append(Component.text(player.getUsername()).color(NamedTextColor.WHITE))
                 .append(Component.text(": ").color(NamedTextColor.WHITE))
-                .append(Component.text(event.getMessage())) // 聊天内容
+                .append(Component.text(event.getMessage()))
                 .build();
 
         server.getAllPlayers().forEach(p -> p.sendMessage(message));
